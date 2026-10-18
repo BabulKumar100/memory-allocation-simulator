@@ -38,9 +38,19 @@ The frontend has a local JavaScript fallback if the API is not running, but run 
 - `server/models/Simulation.js`: MongoDB schema
 
 ### Why `shared` lives inside `server/`
-The server is deployed as a standalone service (Railway Root Directory is set to `server`), so the container only receives the contents of `server/`. If the shared module sat at the repo root, the deployed app would crash with `ERR_MODULE_NOT_FOUND: file:///shared/allocation.js`. Keeping it under `server/` means it ships with the server while the client still imports the exact same file through the `@shared` Vite alias, so there is only ever one copy.
+The deployed module must ship with the code that imports it. If the shared module sat at the repo root while the service only receives `server/`, the app would crash at runtime with `ERR_MODULE_NOT_FOUND: file:///shared/allocation.js`. Keeping it under `server/` means it always ships alongside `server.js`, while the client still imports the exact same file through the `@shared` Vite alias, so there is only ever one copy.
 
-To instead deploy from the repo root, remove the Root Directory setting in Railway and add a root `package.json` with `"build": "npm install --prefix server"` and `"start": "node server/server.js"`.
+Rule to follow: nothing under `server/` may import outside `server/` (no `../../` imports), otherwise the deployed app breaks.
+
+### Deployment
+The root `package.json` exists only so the builder can build and start the server without any dashboard configuration:
+
+- `build`: `npm install --prefix server` — installs the server dependencies
+- `start`: `node server/server.js` — starts the API
+
+This works whether the Railway service root is the repository root or is set to `server/`, because `server/package.json` also has its own `start` script.
+
+Set `MONGODB_URI` in the service variables to enable history storage; without it the simulation API still works and history endpoints are disabled.
 
 ## Notes
 - The demo models variable-sized allocations inside each listed memory partition. It keeps each partition as a separate region and reduces its remaining free space after every successful allocation.

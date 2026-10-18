@@ -1,0 +1,13 @@
+{
+  "name": "memory-allocation-simulator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Memory allocation simulator (MERN). This root manifest exists only so the deploy builder (Railpack) knows how to build and start the server when the service root is the repository root. Local development still happens from the client/ and server/ folders.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "cd server && npm install",
+    "start": "node server/server.js"
+  }
+}
