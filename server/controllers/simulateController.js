@@ -1,4 +1,4 @@
-import { simulateAllocation, validatePayload } from "../../shared/allocation.js";
+import { simulateAllocation, validatePayload } from "../shared/allocation.js";
 
 export function simulate(req, res) {
   const errors = validatePayload(req.body);
